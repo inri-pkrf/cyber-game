@@ -21,7 +21,7 @@ const createChips = (items, index) =>
       id: a.id,
       title: a.title,
     })),
-    ...DECOYS[index].map((title, i) => ({
+    ...(DECOYS[index] || []).map((title, i) => ({
       key: `d${i}`,
       id: null,
       title,
@@ -40,16 +40,7 @@ export default function Panel({ index, onComplete }) {
 
   const ref = useRef(null)
   const reported = useRef(false)
-
-  const restartGame = () => {
-    setGameItems(shuffle(items))
-    setChips(createChips(items, index))
-    setDone([])
-    setOpen(null)
-    setHot(null)
-    setNo(null)
-    reported.current = false
-  }
+  const waitingForInfo = useRef(false)
 
   const findZone = (x, y) => {
     if (!ref.current) return null
@@ -89,6 +80,8 @@ export default function Panel({ index, onComplete }) {
     setHot(null)
 
     if (zone && chip.id === zone) {
+      waitingForInfo.current = true
+
       setDone((previous) =>
         previous.includes(zone) ? previous : [...previous, zone]
       )
@@ -100,15 +93,23 @@ export default function Panel({ index, onComplete }) {
     }
   }
 
-  const finished = items.length > 0 && done.length === items.length && !open
-  const current = ATTACKS.find((a) => a.id === open)
+  const finished =
+    items.length > 0 &&
+    done.length === items.length &&
+    !open
 
   useEffect(() => {
-    if (finished && !reported.current) {
+    if (
+      finished &&
+      !waitingForInfo.current &&
+      !reported.current
+    ) {
       reported.current = true
       onComplete(index)
     }
   }, [finished, index, onComplete])
+
+  const current = ATTACKS.find((a) => a.id === open)
 
   return (
     <section className="panel" ref={ref}>
@@ -179,7 +180,15 @@ export default function Panel({ index, onComplete }) {
             <div className="bd">
               <h3>{current.title}</h3>
               <p>{current.text}</p>
-              <button onClick={() => setOpen(null)}>המשך</button>
+
+              <button
+                onClick={() => {
+                  setOpen(null)
+                  waitingForInfo.current = false
+                }}
+              >
+                המשך
+              </button>
             </div>
           </div>
         </div>
