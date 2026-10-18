@@ -1,7 +1,7 @@
+
 import { useRef, useState, useEffect } from 'react'
 import { ATTACKS, DECOYS } from './data.js'
 import Chip from './Chip'
-import confetti from 'canvas-confetti' // אופציונלי: לקונפטי מובנה חלק ויפה יותר
 
 const shuffle = (array) => {
   const result = [...array]
@@ -28,7 +28,7 @@ const createChips = (items, index) =>
     })),
   ])
 
-export default function Panel({ index }) {
+export default function Panel({ index, onComplete }) {
   const items = ATTACKS.filter((a) => a.panel === index)
 
   const [gameItems, setGameItems] = useState(() => shuffle(items))
@@ -37,21 +37,18 @@ export default function Panel({ index }) {
   const [open, setOpen] = useState(null)
   const [hot, setHot] = useState(null)
   const [no, setNo] = useState(null)
-  const ref = useRef(null)
 
-  // דואג לערבוב מחדש בכל פעם שה-index (השלב/הפאנל) מששתנה
-  useEffect(() => {
-    restartGame()
-  }, [index])
+  const ref = useRef(null)
+  const reported = useRef(false)
 
   const restartGame = () => {
-    const currentItems = ATTACKS.filter((a) => a.panel === index)
-    setGameItems(shuffle(currentItems))
-    setChips(createChips(currentItems, index))
+    setGameItems(shuffle(items))
+    setChips(createChips(items, index))
     setDone([])
     setOpen(null)
     setHot(null)
     setNo(null)
+    reported.current = false
   }
 
   const findZone = (x, y) => {
@@ -92,25 +89,10 @@ export default function Panel({ index }) {
     setHot(null)
 
     if (zone && chip.id === zone) {
-      setDone((previous) => {
-        const updated = previous.includes(zone) ? previous : [...previous, zone]
-        
-        // בדיקה האם זה היה הצעד האחרון שמסיים את המשחק
-        if (updated.length === items.length) {
-          // הפעלת קונפטי חיצוני ברגע הניצחון
-          try {
-            confetti({
-              particleCount: 100,
-              spread: 70,
-              origin: { y: 0.6 }
-            })
-          } catch (e) {
-            // התעלמות אם הספריה לא מותקנת ומסתמכים רק על הקונפטי ב-HTML
-          }
-        }
+      setDone((previous) =>
+        previous.includes(zone) ? previous : [...previous, zone]
+      )
 
-        return updated
-      })
       setTimeout(() => setOpen(zone), 450)
     } else if (zone) {
       setNo(zone)
@@ -118,13 +100,21 @@ export default function Panel({ index }) {
     }
   }
 
-  const finished = done.length === items.length && !open
+  const finished = items.length > 0 && done.length === items.length && !open
   const current = ATTACKS.find((a) => a.id === open)
+
+  useEffect(() => {
+    if (finished && !reported.current) {
+      reported.current = true
+      onComplete(index)
+    }
+  }, [finished, index, onComplete])
 
   return (
     <section className="panel" ref={ref}>
       <header>
         <h2>גררו כל שם מתקפה אל המקום שמתחת לתמונה</h2>
+
         <div className="dots">
           {gameItems.map((a) => (
             <b
@@ -185,36 +175,12 @@ export default function Panel({ index }) {
               className="pic"
               style={{ backgroundImage: `url(${current.image})` }}
             />
+
             <div className="bd">
               <h3>{current.title}</h3>
               <p>{current.text}</p>
               <button onClick={() => setOpen(null)}>המשך</button>
             </div>
-          </div>
-        </div>
-      )}
-
-      {finished && (
-        <div className="success-modal">
-          <div className="confetti-container" aria-hidden="true">
-            {Array.from({ length: 65 }, (_, i) => (
-              <i
-                key={i}
-                className="confetti"
-                style={{
-                  left: `${(i * 37) % 100}%`,
-                  animationDelay: `${(i % 12) * 0.12}s`,
-                  animationDuration: `${2 + (i % 5) * 0.4}s`,
-                }}
-              />
-            ))}
-          </div>
-
-          <div className="success-dialog" role="dialog" aria-modal="true">
-            <div className="success-emoji">🎉</div>
-            <h2>כל הכבוד!</h2>
-            <p>זיהיתם בהצלחה את כל המתקפות בחלק הזה!</p>
-            <button onClick={restartGame}>משחק חדש 🔄</button>
           </div>
         </div>
       )}
