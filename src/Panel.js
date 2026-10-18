@@ -1,7 +1,7 @@
-
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { ATTACKS, DECOYS } from './data.js'
 import Chip from './Chip'
+import confetti from 'canvas-confetti' // אופציונלי: לקונפטי מובנה חלק ויפה יותר
 
 const shuffle = (array) => {
   const result = [...array]
@@ -39,9 +39,15 @@ export default function Panel({ index }) {
   const [no, setNo] = useState(null)
   const ref = useRef(null)
 
+  // דואג לערבוב מחדש בכל פעם שה-index (השלב/הפאנל) מששתנה
+  useEffect(() => {
+    restartGame()
+  }, [index])
+
   const restartGame = () => {
-    setGameItems(shuffle(items))
-    setChips(createChips(items, index))
+    const currentItems = ATTACKS.filter((a) => a.panel === index)
+    setGameItems(shuffle(currentItems))
+    setChips(createChips(currentItems, index))
     setDone([])
     setOpen(null)
     setHot(null)
@@ -86,9 +92,25 @@ export default function Panel({ index }) {
     setHot(null)
 
     if (zone && chip.id === zone) {
-      setDone((previous) =>
-        previous.includes(zone) ? previous : [...previous, zone]
-      )
+      setDone((previous) => {
+        const updated = previous.includes(zone) ? previous : [...previous, zone]
+        
+        // בדיקה האם זה היה הצעד האחרון שמסיים את המשחק
+        if (updated.length === items.length) {
+          // הפעלת קונפטי חיצוני ברגע הניצחון
+          try {
+            confetti({
+              particleCount: 100,
+              spread: 70,
+              origin: { y: 0.6 }
+            })
+          } catch (e) {
+            // התעלמות אם הספריה לא מותקנת ומסתמכים רק על הקונפטי ב-HTML
+          }
+        }
+
+        return updated
+      })
       setTimeout(() => setOpen(zone), 450)
     } else if (zone) {
       setNo(zone)
