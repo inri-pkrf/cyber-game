@@ -1,192 +1,189 @@
 
-import { useRef, useState, useEffect } from 'react'
-import { ATTACKS, DECOYS } from './data.js'
+import { useRef, useState } from 'react'
 import Chip from './Chip'
 
-const shuffle = (array) => {
-  const result = [...array]
-
-  for (let i = result.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    ;[result[i], result[j]] = [result[j], result[i]]
-  }
-
-  return result
+function getImage(item) {
+  return item.image ?? item.img ?? item.imageUrl ?? ''
 }
 
-const createChips = (items, index) =>
-  shuffle([
-    ...items.map((a) => ({
-      key: a.id,
-      id: a.id,
-      title: a.title,
-    })),
-    ...(DECOYS[index] || []).map((title, i) => ({
-      key: `d${i}`,
-      id: null,
-      title,
-    })),
-  ])
+function getDescription(item) {
+  return item.text ?? item.description ?? item.info ?? ''
+}
 
-export default function Panel({ index, onComplete }) {
-  const items = ATTACKS.filter((a) => a.panel === index)
+// חיפוש אזור הנחיתה בכל שלושת המסכים.
+function getZoneAtPoint(x, y) {
+  if (typeof document === 'undefined') return null
 
-  const [gameItems, setGameItems] = useState(() => shuffle(items))
-  const [chips, setChips] = useState(() => createChips(items, index))
-  const [done, setDone] = useState([])
+  const elements = document.querySelectorAll('[data-zone]')
+
+  for (const element of elements) {
+    const rect = element.getBoundingClientRect()
+
+    if (
+      x >= rect.left &&
+      x <= rect.right &&
+      y >= rect.top &&
+      y <= rect.bottom
+    ) {
+      return element.dataset.zone
+    }
+  }
+
+  return null
+}
+
+export default function Panel({
+  index,
+  items,
+  chips,
+  completedIds,
+  onMatch,
+}) {
   const [open, setOpen] = useState(null)
   const [hot, setHot] = useState(null)
   const [no, setNo] = useState(null)
 
-  const ref = useRef(null)
-  const reported = useRef(false)
-  const waitingForInfo = useRef(false)
+  const handledRef = useRef(new Set())
+  const completedSet = new Set(completedIds)
 
-  const findZone = (x, y) => {
-    if (!ref.current) return null
+  const current = items.find(
+    (item) => String(item.id) === String(open)
+  )
 
-    const margin = window.innerHeight * 0.03
-    let best = null
-    let bestDistance = Infinity
-
-    ref.current
-      .querySelectorAll('[data-zone]:not([data-done])')
-      .forEach((zone) => {
-        const rect = zone.getBoundingClientRect()
-
-        if (
-          x > rect.left - margin &&
-          x < rect.right + margin &&
-          y > rect.top - margin &&
-          y < rect.bottom + margin
-        ) {
-          const distance = Math.hypot(
-            x - (rect.left + rect.right) / 2,
-            y - (rect.top + rect.bottom) / 2
-          )
-
-          if (distance < bestDistance) {
-            bestDistance = distance
-            best = zone.dataset.zone
-          }
-        }
-      })
-
-    return best
+  function handleMove(x, y) {
+    const zone = getZoneAtPoint(x, y)
+    setHot(zone)
   }
 
-  const drop = (chip, x, y) => {
-    const zone = findZone(x, y)
+  function handleDrop(chip, x, y) {
+    const zone = getZoneAtPoint(x, y)
+
     setHot(null)
+    setNo(null)
 
-    if (zone && chip.id === zone) {
-      waitingForInfo.current = true
+    if (!zone) return
 
-      setDone((previous) =>
-        previous.includes(zone) ? previous : [...previous, zone]
-      )
+    const normalizedZone = String(zone)
 
-      setTimeout(() => setOpen(zone), 450)
-    } else if (zone) {
-      setNo(zone)
-      setTimeout(() => setNo(null), 450)
+    // התאמה שכבר הושלמה אינה נספרת שוב.
+    if (completedSet.has(normalizedZone)) return
+
+    const correct =
+      chip.id !== null &&
+      chip.id !== undefined &&
+      String(chip.id) === normalizedZone
+
+    if (correct) {
+      if (handledRef.current.has(normalizedZone)) return
+
+      handledRef.current.add(normalizedZone)
+      onMatch(normalizedZone)
+      setOpen(normalizedZone)
+    } else {
+      setNo(normalizedZone)
+
+      setTimeout(() => {
+        setNo(null)
+      }, 450)
     }
   }
 
-  const finished =
-    items.length > 0 &&
-    done.length === items.length &&
-    !open
-
-  useEffect(() => {
-    if (
-      finished &&
-      !waitingForInfo.current &&
-      !reported.current
-    ) {
-      reported.current = true
-      onComplete(index)
-    }
-  }, [finished, index, onComplete])
-
-  const current = ATTACKS.find((a) => a.id === open)
+  const completedHere = items.filter((item) =>
+    completedSet.has(String(item.id))
+  ).length
 
   return (
-    <section className="panel" ref={ref}>
-      <header>
-        <h2>גררו כל שם מתקפה אל המקום שמתחת לתמונה</h2>
+    <section className="panel">
+      <header className="header">
+        <h2>חלק {index + 1}</h2>
 
         <div className="dots">
-          {gameItems.map((a) => (
-            <b
-              key={a.id}
-              className={done.includes(a.id) ? 'on' : ''}
+          {items.map((item) => (
+            <span
+              key={item.id}
+              className={
+                completedSet.has(String(item.id))
+                  ? 'dot done'
+                  : 'dot'
+              }
             />
           ))}
         </div>
       </header>
 
+      <div className="hud">
+        הושלמו {completedHere} מתוך {items.length} בחלק הזה
+      </div>
+
       <div className="zones">
-        {gameItems.map((a) => {
-          const isDone = done.includes(a.id)
+        {items.map((item) => {
+          const id = String(item.id)
+          const done = completedSet.has(id)
 
           return (
             <div
-              key={a.id}
-              data-zone={a.id}
-              data-done={isDone || undefined}
-              className={
-                'zone' +
-                (isDone ? ' done' : '') +
-                (hot === a.id ? ' hot' : '') +
-                (no === a.id ? ' no' : '')
-              }
+              key={item.id}
+              className={[
+                'zone',
+                done ? 'done' : '',
+                hot === id ? 'hot' : '',
+                no === id ? 'wrong' : '',
+              ]
+                .filter(Boolean)
+                .join(' ')}
+              data-zone={id}
             >
               <div className="shot">
-                <img src={a.image} alt="" draggable={false} />
-                <i className="hud" />
+                {getImage(item) ? (
+                  <img
+                    src={getImage(item)}
+                    alt={item.title}
+                    draggable={false}
+                  />
+                ) : (
+                  <div className="pic">{item.title}</div>
+                )}
               </div>
 
               <div className="slot">
-                {isDone ? a.title : <small>גררו לכאן את שם המתקפה</small>}
+                {done
+                  ? '✓ הותאם בהצלחה'
+                  : 'גררו לכאן את השבב המתאים'}
               </div>
             </div>
           )
         })}
       </div>
 
-      <footer className="tray">
-        {chips
-          .filter((chip) => !chip.id || !done.includes(chip.id))
-          .map((chip) => (
-            <Chip
-              key={chip.key}
-              label={chip.title}
-              disabled={!!open || finished}
-              onMove={(x, y) => setHot(findZone(x, y))}
-              onDrop={(x, y) => drop(chip, x, y)}
-            />
-          ))}
-      </footer>
+      <div className="tray">
+        {chips.map((chip) => (
+          <Chip
+            key={chip.key}
+            label={chip.title}
+            disabled={Boolean(open)}
+            onMove={handleMove}
+            onDrop={(x, y) => handleDrop(chip, x, y)}
+          />
+        ))}
+      </div>
 
       {current && (
         <div className="modal">
-          <div className="dlg" role="dialog">
-            <div
-              className="pic"
-              style={{ backgroundImage: `url(${current.image})` }}
-            />
+          <div className="dlg" role="dialog" aria-modal="true">
+            {getImage(current) && (
+              <img
+                className="pic"
+                src={getImage(current)}
+                alt={current.title}
+                draggable={false}
+              />
+            )}
 
             <div className="bd">
               <h3>{current.title}</h3>
-              <p>{current.text}</p>
+              <p>{getDescription(current)}</p>
 
-              <button
-                onClick={() => {
-                  setOpen(null)
-                  waitingForInfo.current = false
-                }}
-              >
+              <button onClick={() => setOpen(null)}>
                 המשך
               </button>
             </div>
