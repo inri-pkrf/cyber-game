@@ -484,3 +484,140 @@ button {
     transition: none !important;
   }
 }
+
+
+/* שכבת חלון ההצלחה */
+.success-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  overflow: hidden;
+  background: rgba(5, 12, 28, 0.82);
+  backdrop-filter: blur(7px);
+  direction: rtl;
+}
+
+/* חלון ההצלחה */
+.success-dialog {
+  position: relative;
+  z-index: 2;
+  width: min(440px, 92vw);
+  padding: 36px 28px;
+  text-align: center;
+  color: #f7f4eb;
+  background: linear-gradient(145deg, #172744, #0d172b);
+  border: 1px solid #d9b86c;
+  border-radius: 22px;
+  box-shadow: 0 20px 70px #0008;
+  animation: success-pop 0.55s cubic-bezier(.2, .8, .2, 1) both;
+}
+
+.success-emoji {
+  font-size: 58px;
+  margin-bottom: 12px;
+  animation: success-bounce 1s ease-in-out infinite alternate;
+}
+
+.success-dialog h2 {
+  margin: 0 0 12px;
+  color: #f1cf7a;
+  font-size: 32px;
+}
+
+.success-dialog p {
+  margin: 0 0 24px;
+  line-height: 1.7;
+  font-size: 17px;
+}
+
+.success-dialog button {
+  padding: 12px 28px;
+  color: #15213a;
+  background: #f1cf7a;
+  border: none;
+  border-radius: 10px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.2s;
+}
+
+.success-dialog button:hover {
+  background: #ffe4a0;
+  transform: translateY(-2px);
+}
+
+/* קונפטי */
+.confetti-container {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.confetti {
+  position: absolute;
+  top: -20px;
+  width: 9px;
+  height: 15px;
+  border-radius: 2px;
+  background: #f1cf7a;
+  animation: confetti-fall 3s linear infinite;
+}
+
+.confetti:nth-child(3n) {
+  background: #6ee7d8;
+  width: 7px;
+  height: 12px;
+}
+
+.confetti:nth-child(3n + 1) {
+  background: #ff8b9b;
+  border-radius: 50%;
+}
+
+.confetti:nth-child(3n + 2) {
+  background: #b9a0ff;
+  width: 10px;
+  height: 8px;
+}
+
+@keyframes confetti-fall {
+  0% {
+    top: -5%;
+    transform: translateX(0) rotate(0deg);
+    opacity: 1;
+  }
+
+  100% {
+    top: 110%;
+    transform: translateX(45px) rotate(720deg);
+    opacity: 0.2;
+  }
+}
+
+@keyframes success-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.75);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes success-bounce {
+  from {
+    transform: translateY(0) rotate(-8deg);
+  }
+
+  to {
+    transform: translateY(-8px) rotate(8deg);
+  }
+}
