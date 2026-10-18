@@ -168,6 +168,7 @@ h2 {
     var(--c) 100% 100% / 2px 2.6vh no-repeat;
 }
 
+
 /* שמות סוגי המתקפות – טקסט קטן וללא מסגרת */
 .slot {
   display: grid;
@@ -231,6 +232,7 @@ h2 {
     transform: translateX(.7vh);
   }
 }
+
 
 /* אזור אפשרויות המתקפה */
 .tray {
@@ -338,6 +340,7 @@ h3 {
   color: var(--brass);
 }
 
+
 .bd p {
   margin: 0;
   max-width: 56ch;
@@ -416,6 +419,7 @@ button {
   counter-reset: s;
 }
 
+
 .ip li {
   position: relative;
   padding-inline-start: 6vh;
@@ -446,6 +450,7 @@ button {
   align-items: center;
   text-align: center;
 }
+  
 
 .ip.mid h1 {
   margin: 0;
@@ -456,7 +461,7 @@ button {
 .ip.mid .lead {
   color: var(--muted);
 }
-
+ 
 .go {
   margin-top: 3vh;
   padding: 2.4vh 7vw;
@@ -464,7 +469,7 @@ button {
   border-radius: 1.6vh;
   box-shadow: 0 2vh 5vh #000a;
 }
-
+ 
 @media (prefers-reduced-motion: reduce) {
   * {
     animation: none !important;
