@@ -16,7 +16,6 @@ export default function Intro({ leaving, onStart }) {
       <section className="ip">
         <h2>{T.howTitle}</h2>
         <ol>{T.steps.map((s, i) => <li key={i}>{s}</li>)}</ol>
-        <p className="note">{T.note}</p>
       </section>
     </div>
   )
