@@ -10,12 +10,12 @@ export const rowsFor = (n) => {
 
 // המסך הימני: כל התמונות באותו גודל, ממורכזות, בלי מסגרת, עם מספר קטן בפינה הימנית העליונה.
 // המספר הוא המקום בסדר (order), והסדר מתערבב בכל משחק חדש. במסך הפתיחה המספרים מוסתרים (numbered=false) ומופיעים כשהמשחק מתחיל.
-// הגודל נקבע לפי הגובה וגם לפי הרוחב של המסך, כדי שכל התמונות ייכנסו בשלמותן.
+// הגודל נקבע לפי הגובה וגם לפי הרוחב של המסך, כדי שכל התמונות ייכנסו בשלמותן. כדי להגדיל או להקטין את התמונות משנים את המספר 80 (אחוז מגובה המסך שהתמונות תופסות).
 export default function Gallery({ order, done, numbered = true }) {
   const rows = rowsFor(order.length)
   const widest = Math.max(...rows)
   const starts = rows.map((_, i) => rows.slice(0, i).reduce((s, c) => s + c, 0))
-  const byHeight = Math.min(28, ((72 - (rows.length - 1) * 1.6) / rows.length) * 1.5)
+  const byHeight = Math.min(40, ((80 - (rows.length - 1) * 1.6) / rows.length) * (16 / 9))
   const w = `min(${byHeight}vh, calc((100cqw - ${(widest - 1) * 1.6}vh) / ${widest} - .3vh))`
   return (
     <section className={'panel gallery' + (numbered ? '' : ' nonum')}>

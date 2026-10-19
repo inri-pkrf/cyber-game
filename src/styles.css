@@ -34,7 +34,7 @@ h2 { margin: 0; font: 400 5vh/1 var(--head); letter-spacing: .02em; }
 /* מסך ימני: תמונות ממוספרות, כולן באותו גודל, בלי מסגרת */
 .rows { --g: 1.6vh; flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--g); }
 .row { display: flex; justify-content: center; gap: var(--g); }
-.tile { position: relative; flex: none; width: var(--w); margin: 0; aspect-ratio: 3 / 2; overflow: hidden; border-radius: 1vh; background: var(--raise); transition: box-shadow .3s; }
+.tile { position: relative; flex: none; width: var(--w); margin: 0; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 1vh; background: var(--raise); transition: box-shadow .3s; }
 .tile img { display: block; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
 .num { position: absolute; top: 0; right: 0; left: auto; display: grid; place-items: center; min-width: 3vh; height: 3vh; padding: 0 .7vh; font: 700 2.3vh/1 var(--head); color: var(--ink); background: var(--acc); border-radius: 0 0 0 1vh; transition: opacity .5s, transform .5s; transform-origin: 100% 0; }
 .nonum .num { opacity: 0; transform: scale(.4); }
@@ -45,7 +45,7 @@ h2 { margin: 0; font: 400 5vh/1 var(--head); letter-spacing: .02em; }
 /* מסך אמצעי: הוראות ומונה, הכול ממורכז */
 .info { justify-content: center; align-items: center; text-align: center; }
 .info header { justify-content: center; width: 60%; border-image: linear-gradient(90deg, transparent, var(--ok), transparent) 1; }
-.info h2 { font-size: 6vh; }
+.info .title { margin: 0 0 2vh; font: 700 14vh/.9 var(--head); color: var(--text); text-shadow: 0 0 5vh var(--acc-soft); }
 .how { margin: 0; max-width: 46ch; font-size: 3.6vh; line-height: 1.7; color: var(--muted); }
 .score { width: 75%; margin-top: 2vh; display: flex; flex-direction: column; align-items: center; gap: 1.4vh; padding: 3.4vh 2vw; text-align: center; background: #0b0d13cc; border: 1px solid var(--acc-soft); border-radius: 2vh; }
 .lbl { font: 400 4vh/1 var(--head); color: var(--muted); }
