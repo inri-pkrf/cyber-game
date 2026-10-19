@@ -36,7 +36,8 @@ h2 { margin: 0; font: 400 5vh/1 var(--head); letter-spacing: .02em; }
 .row { display: flex; justify-content: center; gap: var(--g); }
 .tile { position: relative; flex: none; width: var(--w); margin: 0; aspect-ratio: 3 / 2; overflow: hidden; border-radius: 1vh; background: var(--raise); transition: box-shadow .3s; }
 .tile img { display: block; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
-.num { position: absolute; top: 0; right: 0; left: auto; display: grid; place-items: center; min-width: 3vh; height: 3vh; padding: 0 .7vh; font: 700 2.3vh/1 var(--head); color: var(--ink); background: var(--acc); border-radius: 0 0 0 1vh; }
+.num { position: absolute; top: 0; right: 0; left: auto; display: grid; place-items: center; min-width: 3vh; height: 3vh; padding: 0 .7vh; font: 700 2.3vh/1 var(--head); color: var(--ink); background: var(--acc); border-radius: 0 0 0 1vh; transition: opacity .5s, transform .5s; transform-origin: 100% 0; }
+.nonum .num { opacity: 0; transform: scale(.4); }
 .tile figcaption { position: absolute; inset: auto 0 0; padding: 4vh 1vh .9vh; text-align: center; font: 700 3.4vh/1 var(--head); background: linear-gradient(transparent, #000d); }
 .tile.ok { box-shadow: 0 0 0 .5vh var(--ok), 0 0 3vh var(--ok-soft); }
 .tile.ok .num { background: var(--ok); }
@@ -54,7 +55,7 @@ h2 { margin: 0; font: 400 5vh/1 var(--head); letter-spacing: .02em; }
 .again { margin-top: 1vh; padding: 1.4vh 3.4vw; font-size: 3.2vh; }
 .msg { margin: 0; font-size: 3.6vh; color: var(--muted); }
 .score.all { border-color: var(--ok); box-shadow: 0 0 4vh var(--ok-soft); }
-.score.all .big { color: var(--ok); }
+.score.all .big { color: var(--ok); font-size: 18vh; }
 .score.all .msg { color: var(--ok); font-size: 4.4vh; }
 
 /* מסך שמאלי: שמות המתקפות */
@@ -103,9 +104,10 @@ button { margin-top: 1vh; padding: 1.4vh 3.4vw; font: 600 3vh var(--body); color
 @container (min-width: 900px) { .dlg { grid-template-columns: 1fr 1fr; } .pic { min-height: 0; } }
 
 /* מסך פתיחה: כל טקסט ממורכז במסך שלו */
-.intro { position: fixed; inset: 0; z-index: 200; display: grid; grid-template-columns: repeat(3, 1fr); background:
-    linear-gradient(#ffffff06 1px, transparent 1px) 0 0 / 5vh 5vh, linear-gradient(90deg, #ffffff06 1px, transparent 1px) 0 0 / 5vh 5vh,
-    radial-gradient(90% 70% at 50% 0%, #1b1530 0%, var(--ink) 70%); transition: opacity .5s; }
+.intro { position: fixed; inset: 0; z-index: 200; display: grid; grid-template-columns: repeat(3, 1fr); transition: opacity .5s; pointer-events: none; }
+.intro .ip { pointer-events: auto; border-inline-start: 1px solid transparent; border-image: linear-gradient(transparent, var(--acc-soft), transparent) 1;
+  background: linear-gradient(#ffffff06 1px, transparent 1px) 0 0 / 5vh 5vh, linear-gradient(90deg, #ffffff06 1px, transparent 1px) 0 0 / 5vh 5vh, radial-gradient(90% 70% at 50% 0%, #1b1530 0%, var(--ink) 70%);
+  background-attachment: fixed; }
 .intro.out { opacity: 0; pointer-events: none; }
 .ip { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3vh; padding: 6vh 5vw; text-align: center; }
 .ip h2 { font-size: 6.4vh; color: var(--acc); }

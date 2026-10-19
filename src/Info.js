@@ -7,8 +7,8 @@ export default function Info({ done, onAgain }) {
   const all = n === total
   return (
     <section className="panel info">
-      <header><h2>{T.howTitle}</h2></header>
-      <p className="how">{T.howText}</p>
+      {!all && <header><h2>{T.howTitle}</h2></header>}
+      {!all && <p className="how">{T.howText}</p>}
       <div className={'score' + (all ? ' all' : '')}>
         <span className="lbl">הצלחנו להתאים</span>
         <strong className="big"><span dir="ltr">{n} / {total}</span></strong>

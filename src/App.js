@@ -27,16 +27,14 @@ export default function App() {
     return () => window.removeEventListener('pointerdown', f)
   }, [])
 
-  const start = () => {
-    setOrder(shuffle(ATTACKS)); setDone([]); setGame((g) => g + 1)
-    setPhase('leaving'); setTimeout(() => setPhase('play'), 500)
-  }
-  const again = () => setPhase('intro')
+  const start = () => { setPhase('leaving'); setTimeout(() => setPhase('play'), 500) }
+  // משחק חדש: מערבבים מחדש את מספרי התמונות ואת השמות ומאפסים את ההתאמות. (בטעינת הדף הם מתערבבים גם כן.)
+  const again = () => { setOrder(shuffle(ATTACKS)); setDone([]); setGame((g) => g + 1); setPhase('intro') }
   const match = (id) => setDone((d) => (d.includes(id) ? d : [...d, id]))
   return (
     <>
       <main className="stage">
-        <Gallery order={order} done={done} />
+        <Gallery order={order} done={done} numbered={phase !== 'intro'} />
         <Info done={done} onAgain={again} />
         <Titles key={game} order={order} done={done} onMatch={match} />
       </main>
