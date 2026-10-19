@@ -119,3 +119,38 @@ button { margin-top: 1vh; padding: 1.4vh 3.4vw; font: 600 3vh var(--body); color
 .ip.mid .lead { color: var(--muted); }
 .go { margin-top: 3vh; padding: 2.4vh 7vw; font-size: 4.4vh; border-radius: 1.6vh; box-shadow: 0 0 5vh var(--ok-soft); }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* חלק שני – התאמת משמעויות. נשמרו אותם מסכים, טיפוגרפיה ויחסי גדלים; הפלטה אפורה-שחורה. */
+.meaning-stage { --ink: #08090b; --deep: #101114; --raise: #1b1d21; --line: #393c42; --acc: #aeb4bf; --acc-soft: #aeb4bf55; --ok: #65e6ad; --ok-soft: #65e6ad55; --bad: #ff667a; --text: #f0f1f3; --muted: #a3a6ad; background: radial-gradient(80% 70% at 50% 0%, #25282d 0%, #08090b 75%); }
+.meaning-stage .panel { background: transparent; }
+.meaning-stage .panel + .panel { border-image: linear-gradient(transparent, #ffffff25, transparent) 1; }
+.meaning-center { justify-content: center; align-items: center; text-align: center; gap: 3vh; }
+.meaning-title { margin: 0; font: 700 10vh/.95 var(--head); color: var(--text); text-shadow: 0 0 4vh #ffffff18; }
+.meaning-image-wrap { width: 72%; max-height: 44vh; margin-inline: auto; aspect-ratio: 16 / 9; display: grid; place-items: center; overflow: hidden; border-radius: 1.5vh; background: #17191d; border: 1px solid #ffffff22; box-shadow: 0 2vh 6vh #0009; }
+.meaning-image-wrap img { display: block; width: 100%; height: 100%; object-fit: contain; object-position: center; margin: auto; }
+.meaning-progress { width: 75%; margin-top: 0; display: flex; flex-direction: column; align-items: center; gap: 1.4vh; padding: 2.2vh 2vw; color: var(--muted); font-size: 2.5vh; background: #101114cc; border: 1px solid #aeb4bf55; border-radius: 2vh; }
+.meaning-progress .lbl { font-size: 2.6vh; color: var(--muted); }
+.meaning-progress .big { font: 700 10vh/.95 var(--head); color: var(--acc); }
+.meaning-progress .bar { width: 80%; height: 1.6vh; background: var(--raise); border-radius: 1vh; overflow: hidden; }
+.meaning-progress .bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--acc), var(--ok)); border-radius: 1vh; transition: width .5s; }
+.meaning-progress.all { border-color: var(--ok); box-shadow: 0 0 4vh var(--ok-soft); }
+.meaning-progress.all .big { color: var(--ok); }
+.meaning-step { font-size: 2vh; color: var(--muted); }
+.meaning-count { display: flex; align-items: center; justify-content: center; gap: 1.5vw; }
+.meaning-count strong, .meaning-score { color: var(--ok); font: 700 4vh/1 var(--head); }
+.meaning-bar { width: 100%; height: 1.4vh; background: #292c31; border-radius: 2vh; overflow: hidden; }
+.meaning-bar i { display: block; height: 100%; background: linear-gradient(90deg, #777e89, var(--ok)); transition: width .35s; }
+.meaning-side { gap: 2vh; }
+.meaning-side header { border-image: linear-gradient(270deg, #aeb4bf88, transparent) 1; }
+.meaning-options { flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: center; gap: 1.2vh; }
+.meaning-option { width: 100%; margin: 0; padding: 1.5vh 1.2vw; min-height: 10vh; font-family: 'Assistant', Arial, sans-serif; font-size: 2.8vh; font-weight: 400; line-height: 1.25; color: var(--text); text-align: right; background: linear-gradient(180deg, #22252a, #151619); border: 1px solid #ffffff18; border-radius: 1.2vh; box-shadow: 0 1vh 2vh #0005; }
+.meaning-option:disabled { opacity: .55; }
+.meaning-option.meaning-done, .meaning-option.meaning-correct { color: #75f0b8; background: #65e6ad20; border-color: #65e6ad; box-shadow: 0 0 2vh #65e6ad25; }
+.meaning-option.meaning-wrong { color: #ff8997; background: #ff667a20; border-color: var(--bad); animation: shake .3s; }
+.meaning-transition .meaning-center { gap: 4vh; }
+.meaning-transition .meaning-title { font-size: 14vh; }
+.meaning-finish .meaning-score { font-size: 8vh; }
+.meaning-finish-message { margin: 0; color: var(--muted); font-size: 3.4vh; }
+.meaning-transition .meaning-bar { width: 65%; }
+.meaning-transition .go { margin-top: 1vh; }
+@media (max-width: 1100px) { .meaning-option { font-size: 2.4vh; } }
