@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/cyber-game/static/css/main.051d65d1.css",
-    "main.js": "/cyber-game/static/js/main.ade835b1.js",
+    "main.css": "/cyber-game/static/css/main.7f9ea430.css",
+    "main.js": "/cyber-game/static/js/main.2d5c14b0.js",
     "index.html": "/cyber-game/index.html",
-    "main.051d65d1.css.map": "/cyber-game/static/css/main.051d65d1.css.map",
-    "main.ade835b1.js.map": "/cyber-game/static/js/main.ade835b1.js.map"
+    "main.7f9ea430.css.map": "/cyber-game/static/css/main.7f9ea430.css.map",
+    "main.2d5c14b0.js.map": "/cyber-game/static/js/main.2d5c14b0.js.map"
   },
   "entrypoints": [
-    "static/css/main.051d65d1.css",
-    "static/js/main.ade835b1.js"
+    "static/css/main.7f9ea430.css",
+    "static/js/main.2d5c14b0.js"
   ]
 }
