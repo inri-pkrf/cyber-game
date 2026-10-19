@@ -20,6 +20,15 @@ export default function App() {
   const [done, setDone] = useState([]) // מזהי המתקפות שהותאמו נכון
   const [order, setOrder] = useState(() => shuffle(ATTACKS)) // סדר התמונות = המספרים (מתערבב בכל משחק חדש)
   const [game, setGame] = useState(0)
+  const [showNextButton, setShowNextButton] = useState(false)
+
+  // כשההתאמות מסתיימות, משאירים את מסך המשחק הראשון מוצג ומחליפים את המונה בכפתור אחרי 5 שניות.
+  useEffect(() => {
+    if (done.length !== ATTACKS.length || phase !== 'play') { setShowNextButton(false); return }
+    setShowNextButton(false)
+    const timer = setTimeout(() => setShowNextButton(true), 5000)
+    return () => clearTimeout(timer)
+  }, [done.length, phase])
 
   // הדפדפן מתיר שמע רק אחרי נגיעה ראשונה
   useEffect(() => {
@@ -34,25 +43,11 @@ export default function App() {
   const match = (id) => setDone((d) => {
     if (d.includes(id)) return d
     const next = [...d, id]
-    if (next.length === ATTACKS.length) setTimeout(() => setPhase('first-finish'), 900)
     return next
   })
   const startMeanings = () => setPhase('meaning-play')
   const goToMeaningsIntro = () => setPhase('meaning-intro')
   if (phase === 'meaning-play') return <MeaningGame onAgain={again} />
-  if (phase === 'first-finish') return (
-    <main className="stage meaning-stage meaning-transition">
-      <section className="panel meaning-side empty-side" />
-      <section className="panel meaning-center meaning-finish">
-        <h1 className="meaning-title">זיהוי מתקפות סייבר</h1>
-        <div className="meaning-score">כל הכבוד! 14 / 14</div>
-        <div className="meaning-bar"><i style={{ width: '100%' }} /></div>
-        <p className="meaning-finish-message">סיימתם את החלק הראשון!</p>
-        <button className="go" onClick={goToMeaningsIntro}>לחלק הבא</button>
-      </section>
-      <section className="panel meaning-side empty-side" />
-    </main>
-  )
   if (phase === 'meaning-intro') return (
     <main className="stage meaning-stage meaning-transition">
       <section className="panel meaning-side empty-side" />
@@ -64,7 +59,7 @@ export default function App() {
     <>
       <main className="stage">
         <Gallery order={order} done={done} numbered={phase !== 'intro'} />
-        <Info done={done} onAgain={again} />
+        <Info done={done} onAgain={again} showNextButton={showNextButton} onNext={goToMeaningsIntro} />
         <Titles key={game} order={order} done={done} onMatch={match} />
       </main>
       {(phase === 'intro' || phase === 'leaving') && <Intro leaving={phase === 'leaving'} onStart={start} />}

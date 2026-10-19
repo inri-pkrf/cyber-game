@@ -121,7 +121,7 @@ button { margin-top: 1vh; padding: 1.4vh 3.4vw; font: 600 3vh var(--body); color
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 
 /* חלק שני – התאמת משמעויות. נשמרו אותם מסכים, טיפוגרפיה ויחסי גדלים; הפלטה אפורה-שחורה. */
-.meaning-stage { --ink: #08090b; --deep: #101114; --raise: #1b1d21; --line: #393c42; --acc: #aeb4bf; --acc-soft: #aeb4bf55; --ok: #65e6ad; --ok-soft: #65e6ad55; --bad: #ff667a; --text: #f0f1f3; --muted: #a3a6ad; background: radial-gradient(80% 70% at 50% 0%, #25282d 0%, #08090b 75%); }
+.meaning-stage { background: radial-gradient(90% 70% at 50% 0%, #1b1530 0%, var(--ink) 70%); }
 .meaning-stage .panel { background: transparent; }
 .meaning-stage .panel + .panel { border-image: linear-gradient(transparent, #ffffff25, transparent) 1; }
 .meaning-center { justify-content: center; align-items: center; text-align: center; gap: 3vh; }
@@ -154,3 +154,25 @@ button { margin-top: 1vh; padding: 1.4vh 3.4vw; font: 600 3vh var(--body); color
 .meaning-transition .meaning-bar { width: 65%; }
 .meaning-transition .go { margin-top: 1vh; }
 @media (max-width: 1100px) { .meaning-option { font-size: 2.4vh; } }
+
+
+/* חלק לימודי – שומר על פלטת הצבעים והטיפוגרפיה של החלק הראשון. */
+.meaning-learning .panel { background: transparent; }
+.meaning-learning .panel + .panel { border-image: linear-gradient(transparent, var(--acc-soft), transparent) 1; }
+.meaning-learning-center { gap: 1.8vh; }
+.meaning-learning .meaning-title { font-size: 9vh; text-shadow: 0 0 5vh var(--acc-soft); }
+.impact-topic-title { margin: 0; font: 400 6.2vh/1.05 var(--head); color: var(--acc); text-align: center; }
+.meaning-learning .meaning-image-wrap { width: 66%; max-height: 38vh; background: var(--raise); border-color: var(--acc-soft); box-shadow: 0 2vh 6vh #0009; }
+.meaning-discussion { max-width: 42ch; margin: 0; color: var(--muted); font: 400 3.2vh/1.35 var(--body); text-align: center; }
+.learning-controls { width: 80%; display: flex; flex-direction: column; align-items: center; gap: .7vh; }
+.learning-controls .go { margin-top: .4vh; padding: 1.4vh 3.4vw; font-size: 3.2vh; }
+.learning-progress { width: 72%; height: 1.2vh; overflow: hidden; border-radius: 1vh; background: var(--raise); }
+.learning-progress i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--acc), var(--ok)); transition: width .4s ease; }
+.meaning-tag-panel { gap: 2vh; }
+.meaning-tag-panel header { border-image: linear-gradient(270deg, var(--ok), transparent) 1; }
+.impact-tags { flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: center; gap: 1.4vh; }
+.impact-tag { padding: 1.5vh 1vw; color: var(--text); font: 400 2.65vh/1.25 var(--body); text-align: center; background: linear-gradient(180deg, #1a1d27, #10121a); border: 1px solid var(--acc-soft); border-inline-start: .5vh solid var(--acc); border-radius: 1.4vh; box-shadow: 0 1vh 2.4vh #0008, inset 0 1px 0 #ffffff12; animation: impact-reveal .35s ease-out both; }
+@keyframes impact-reveal { from { opacity: 0; transform: translateY(1.5vh) scale(.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+.meaning-learning .meaning-step { font-size: 2.5vh; }
+.meaning-learning .meaning-finish-message { color: var(--muted); }
+@media (max-width: 1100px) { .impact-tag { font-size: 2.4vh; } .meaning-learning .meaning-title { font-size: 7vh; } }

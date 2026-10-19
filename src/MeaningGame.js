@@ -1,76 +1,181 @@
 import { useMemo, useState } from 'react'
 import { ATTACKS } from './data'
-import { playCorrect, playWrong } from './sound'
 
-// החלק השני: תמונה אחת במרכז ומשפטי משמעות בשני המסכים הצדדיים.
-const shuffle = (a) => {
-  const out = [...a]
-  for (let i = out.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    ;[out[i], out[j]] = [out[j], out[i]]
-  }
-  return out
+// השפעות לדיון עם מנהלי מכלולים ברשות המקומית.
+// כל מתקפה מציגה 4–6 השפעות מעשיות הרלוונטיות להפעלת הרשות בחירום.
+const IMPACTS = {
+  power: [
+    'תיאום תמונת מצב עם המשטרה, פיקוד העורף וכוחות החירום',
+    'זיהוי תושבים הזקוקים לסיוע, במיוחד במבנים ללא חשמל',
+    'פרסום הנחיות ועדכונים בערוצים חלופיים',
+    'בדיקת היכולת לקיים לימודים ופעילות במרכזי חירום',
+    'תעדוף גיבוי חשמל למוקדים ולשירותים חיוניים',
+    'בדיקת זמינות צוותים ותורנויות למשמרות ממושכות'
+  ],
+  water: [
+    'תיאום עם גורמי החירום לגבי אזורים שבהם נדרש מענה מיידי',
+    'איתור צרכים של אוכלוסיות תלויות מים והיערכות לחלוקה',
+    'הנחיות ברורות לגבי שימוש במים ועדכונים מאומתים',
+    'בדיקת תנאי תברואה והחלטה אם ניתן להפעיל מסגרות',
+    'הפעלת ספקים, מכליות מים ופתרונות חלופיים',
+    'איוש מוקד, צוותי שטח ונקודות חלוקת מים'
+  ],
+  monument: [
+    'תיאום בדיקת האירוע במרחב הציבורי עם המשטרה',
+    'הערכת התקהלות או תגובות תושבים סביב האתר',
+    'הבהרה מהו מסר מזויף והפניה למקורות רשמיים',
+    'שיח עם מסגרות חינוכיות על זיהוי מסרים מניפולטיביים',
+    'תיאום עם מפעילי האתר לבדיקת מערכות התצוגה',
+    'מינוי גורם מוסמך לאישור מסרים ועדכונים לציבור'
+  ],
+  hall: [
+    'תיאום עם המשטרה וכוחות החירום לניהול האירוע במקום',
+    'מתן מענה למשתתפים מבוהלים וסיוע למי שזקוק לכך',
+    'הפצת מידע מאומת כדי למנוע שמועות ותיעוד מטעה',
+    'עדכון מסגרות או קבוצות שהיו אמורות להגיע למקום',
+    'בדיקת האולם, מערכות ההגברה וההקרנה לפני חזרה לפעילות',
+    'חלוקת תפקידים ברורה לצוותי המקום ולמוקד העירוני'
+  ],
+  fear: [
+    'הערכת אמינות האיום ותיאום עם המשטרה ופיקוד העורף',
+    'זיהוי תושבים שזקוקים להרגעה או לסיוע ממוקד',
+    'פרסום מסר קצר, מאומת ועקבי בערוצים הרשמיים',
+    'הנחיית צוותים כיצד לשוחח עם ילדים בלי להגביר בהלה',
+    'בדיקת מסכים ומערכות פרסום שנפרצו',
+    'הגדרת דובר מוסמך ותיאום מסרים בין המכלולים'
+  ],
+  sms: [
+    'העברת דוגמאות ההודעות לגורמי הביטחון לבחינה',
+    'מענה לתושבים מודאגים והפניית פניות דחופות',
+    'פרסום אזהרה עם דוגמה להודעה מזויפת והנחיות פעולה',
+    'שליחת הנחיות להורים ולצוותי חינוך דרך ערוצים מאומתים',
+    'היערכות לעומס פניות במוקדים ובערוצי השירות',
+    'תגבור מוקד המידע וניהול משמרות לפי היקף הפניות'
+  ],
+  leak: [
+    'תיאום טיפול באירוע ובחינת סיכון לאנשים שפרטיהם נחשפו',
+    'הכוונת תושבים שנפגעו לקבלת סיוע והגנה על פרטיותם',
+    'הסבר מה ידוע, מה נבדק ואיך להיזהר מהתחזות',
+    'הנחיית צוותים והורים לגבי הודעות חשודות ופגיעה בפרטיות',
+    'תיאום עם מערכות המידע לצמצום החשיפה ולחידוש השירות',
+    'תדרוך עובדים ושמירה על טיפול אחיד ודיסקרטי בפניות'
+  ],
+  mobilize: [
+    'אימות הקריאה לפעולה ותיאום עם המשטרה ופיקוד העורף',
+    'הערכת מוקדי התקהלות אפשריים והיערכות למתן מענה',
+    'הפרכת הסרטון המזויף והפצת עדכון בערוצים רשמיים',
+    'העברת הנחיות למסגרות כדי למנוע הפצת הסרטון בקרב תלמידים',
+    'היערכות אם נוצרת התקהלות או חסימת דרכים',
+    'תיאום מסרים ותחומי אחריות בין הדוברות, המוקד והשטח'
+  ],
+  cameras: [
+    'בדיקת חשיפה של מערכי המצלמות ותיאום עם גורמי הביטחון',
+    'מתן מענה לפניות תושבים בנושא פרטיות ובטיחות',
+    'הסבר מדוד על היקף האירוע בלי להפיץ פרטים רגישים',
+    'הנחיית מוסדות חינוך לדווח על חשש לפגיעה בפרטיות',
+    'תיאום עם ספקי המצלמות להשבת המערכת באופן בטוח',
+    'הגבלת גישה למידע ותיעוד פעולות הטיפול באירוע'
+  ],
+  elevator: [
+    'תיאום עם שירותי הכבאות וההצלה במקרים של לכודים',
+    'איתור דיירים הזקוקים לסיוע במבנים ללא מעלית',
+    'פרסום הנחיות בטיחות ועדכונים על מצב השירות',
+    'בדיקת נגישות ובטיחות במסגרות חינוך ובמרכזי חירום',
+    'הפעלת טכנאים וספקים ותעדוף תיקונים חיוניים',
+    'חלוקת צוותי שטח לפי דחיפות ומיקום התקלות'
+  ],
+  lights: [
+    'תיאום הכוונת תנועה עם המשטרה וגורמי החירום',
+    'עדכון תושבים על צירים עמוסים ודרכי הגעה חלופיות',
+    'פרסום עדכונים בזמן אמת בערוצים הזמינים',
+    'תיאום הסעות ואיסוף בטוח של תלמידים לפי מצב התנועה',
+    'שליחת צוותי תחזוקה ותעדוף צמתים מרכזיים',
+    'הצבת עובדים לסיוע בשטח ותיאום בין צוותים'
+  ],
+  ddos: [
+    'שמירת ערוץ תקשורת חלופי להעברת אירועים דחופים',
+    'פרסום דרכים חלופיות לקבלת סיוע ולדיווח על צרכים',
+    'עדכון על תקלה במוקד והכוונה לערוצים חלופיים',
+    'העברת פרטי קשר חלופיים למוסדות ולרכזי החירום',
+    'תיאום עם ספקי המערכת לשיקום השירות',
+    'תגבור מענה אנושי ותעדוף פניות לפי דחיפות'
+  ],
+  phishing: [
+    'דיווח לגורמי הסייבר והביטחון על התחזות לדמות ציבורית',
+    'סיוע לתושבים שקיבלו הודעה או מסרו פרטים',
+    'פרסום ההודעה המזויפת כאזהרה, בלי להפיץ את הקישור',
+    'הדרכת צוותים והורים לבדוק מקור לפני לחיצה או העברה',
+    'בדיקת מערכות שנפגעו והחלפת פרטי גישה לפי הצורך',
+    'תדרוך עובדי הרשות לא למסור פרטים דרך קישורים חשודים'
+  ],
+  link: [
+    'העברת דיווחים על קישורים זדוניים לגורמים הרלוונטיים',
+    'הכוונת תושבים שנפגעו לצעדי הגנה ולקבלת סיוע',
+    'פרסום דרך פשוטה לדווח על קישור חשוד',
+    'תרגול זיהוי קישורים חשודים עם צוותים ותלמידים',
+    'בדיקת חשבונות ומערכות רשות במקרה של חשיפה',
+    'רענון הנחיות לעובדים ודיווח מהיר על אירוע'
+  ]
 }
 
-// לא כוללים את התמונה cameras.jpg בחלק השני, בהתאם לבקשה.
-const MEANINGS = ATTACKS.filter((a) => !String(a.image).toLowerCase().endsWith('/cameras.jpg'))
+// התמונה cameras.jpg לא משתתפת בחלק הזה, בהתאם לבקשה המקורית.
+const TOPICS = ATTACKS.filter((attack) => !String(attack.image).toLowerCase().endsWith('/cameras.jpg'))
 
 export default function MeaningGame({ onAgain }) {
-  const questions = useMemo(() => shuffle(MEANINGS), [])
+  const topics = useMemo(() => TOPICS, [])
   const [index, setIndex] = useState(0)
-  const [answers, setAnswers] = useState({})
-  const [feedback, setFeedback] = useState({ id: null, correct: false })
-  const current = questions[index]
-  const options = useMemo(() => shuffle(questions), [questions, index])
-  const correctCount = Object.values(answers).filter(Boolean).length
-  const finished = index >= questions.length
+  const [revealed, setRevealed] = useState(false)
+  const current = topics[index]
+  const tags = IMPACTS[current?.id] || [
+    'תיאום תמונת מצב עם גורמי החירום',
+    'זיהוי תושבים הזקוקים לסיוע',
+    'הפצת הנחיות מאומתות',
+    'תיאום תיקון והשבת השירות',
+    'איוש הצוותים ותיאום משימות'
+  ]
+  const finished = index >= topics.length
 
-  function choose(option) {
-    if (!current || answers[current.id] !== undefined) return
-    const correct = option.id === current.id
-    setFeedback({ id: option.id, correct })
-    if (correct) {
-      playCorrect()
-      setAnswers((old) => ({ ...old, [current.id]: true }))
-      window.setTimeout(() => { setIndex((n) => n + 1); setFeedback({ id: null, correct: false }) }, 850)
-    } else {
-      playWrong()
-      window.setTimeout(() => setFeedback({ id: null, correct: false }), 650)
-    }
+  function advance() {
+    if (!revealed) setRevealed(true)
+    else { setIndex((n) => n + 1); setRevealed(false) }
   }
 
-  if (finished) return <main className="stage meaning-stage">
+  if (finished) return <main className="stage meaning-stage meaning-learning">
     <section className="panel meaning-side empty-side" />
     <section className="panel meaning-center meaning-finish">
       <h1 className="meaning-title">ומה המשמעויות?</h1>
-      <div className="meaning-score">כל הכבוד! {correctCount} / {questions.length}</div>
-      <div className="meaning-bar"><i style={{ width: '100%' }} /></div>
-      <button onClick={onAgain}>משחק חדש</button>
+      <div className="meaning-score">סיימנו לעבור על {topics.length} מתקפות</div>
+      <p className="meaning-finish-message">אילו השפעות נוספות זיהיתם במהלך הפעילות?</p>
+      <button className="go" onClick={onAgain}>חזרה להתחלה</button>
     </section>
     <section className="panel meaning-side empty-side" />
   </main>
 
-  return <main className="stage meaning-stage">
-    <section className="panel meaning-side">
-      <header><h2>מה המשמעות?</h2></header>
-      <div className="meaning-options">
-        {options.slice(0, 7).map((option) => <button key={option.id} className={'meaning-option' + (answers[option.id] ? ' meaning-done' : '') + (feedback.id === option.id ? (feedback.correct ? ' meaning-correct' : ' meaning-wrong') : '')} disabled={!!answers[option.id]} onClick={() => choose(option)}>{option.text}</button>)}
+  const leftTags = revealed ? tags.slice(0, Math.ceil(tags.length / 2)) : []
+  const rightTags = revealed ? tags.slice(Math.ceil(tags.length / 2)) : []
+
+  return <main className="stage meaning-stage meaning-learning">
+    <section className="panel meaning-side meaning-tag-panel">
+      <header><h2>השפעות אפשריות</h2></header>
+      <div className="impact-tags">
+        {leftTags.map((tag, i) => <div className="impact-tag" key={`${index}-${tag}`} style={{ animationDelay: '0ms' }}>{tag}</div>)}
       </div>
     </section>
-    <section className="panel meaning-center">
+    <section className="panel meaning-center meaning-learning-center">
       <h1 className="meaning-title">ומה המשמעויות?</h1>
-      <div className="meaning-image-wrap"><img src={current.image} alt="תמונה להתאמה" /></div>
-      <div className={'meaning-progress score' + (correctCount === questions.length ? ' all' : '')}>
-        <span className="lbl">הצלחנו להתאים</span>
-        <strong className="big"><span dir="ltr">{correctCount} / {questions.length}</span></strong>
-        <div className="bar"><i style={{ width: `${(correctCount / questions.length) * 100}%` }} /></div>
-        <span className="meaning-step">תמונה {index + 1} מתוך {questions.length}</span>
+      <h2 className="impact-topic-title">{current.title}</h2>
+      <div className="meaning-image-wrap"><img src={current.image} alt={current.title} /></div>
+      <p className="meaning-discussion">אילו השפעות לדעתכם יכולה המתקפה ליצור על התושבים ועל תפקוד הרשות בחירום?</p>
+      <div className="learning-controls">
+        <span className="meaning-step">מתקפה {index + 1} מתוך {topics.length}</span>
+        <button className="go" onClick={advance}>{revealed ? (index === topics.length - 1 ? 'סיום הפעילות' : 'למתקפה הבאה') : 'חשיפת כל ההשפעות'}</button>
       </div>
+      <div className="learning-progress"><i style={{ width: `${((index + (revealed ? 1 : 0)) / topics.length) * 100}%` }} /></div>
     </section>
-    <section className="panel meaning-side">
-      <header><h2>מה המשמעות?</h2></header>
-      <div className="meaning-options">
-        {options.slice(7).map((option) => <button key={option.id} className={'meaning-option' + (answers[option.id] ? ' meaning-done' : '') + (feedback.id === option.id ? (feedback.correct ? ' meaning-correct' : ' meaning-wrong') : '')} disabled={!!answers[option.id]} onClick={() => choose(option)}>{option.text}</button>)}
+    <section className="panel meaning-side meaning-tag-panel">
+      <header><h2>השפעות אפשריות</h2></header>
+      <div className="impact-tags">
+        {rightTags.map((tag, i) => <div className="impact-tag" key={`${index}-${tag}`} style={{ animationDelay: '0ms' }}>{tag}</div>)}
       </div>
     </section>
   </main>
