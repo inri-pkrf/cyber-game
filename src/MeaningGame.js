@@ -1,138 +1,48 @@
 import { useMemo, useState } from 'react'
-import { ATTACKS } from './data'
+import { ATTACKS } from './data.js'
+import { tagsFor } from './impacts.js'
+import Confetti from './Confetti.js'
 
-// השפעות לדיון עם מנהלי מכלולים ברשות המקומית.
-// כל מתקפה מציגה 4–6 השפעות מעשיות הרלוונטיות להפעלת הרשות בחירום.
-const IMPACTS = {
-  power: [
-    'תיאום תמונת מצב עם המשטרה, פיקוד העורף וכוחות החירום',
-    'זיהוי תושבים הזקוקים לסיוע, במיוחד במבנים ללא חשמל',
-    'פרסום הנחיות ועדכונים בערוצים חלופיים',
-    'בדיקת היכולת לקיים לימודים ופעילות במרכזי חירום',
-    'תעדוף גיבוי חשמל למוקדים ולשירותים חיוניים',
-    'בדיקת זמינות צוותים ותורנויות למשמרות ממושכות'
-  ],
-  water: [
-    'תיאום עם גורמי החירום לגבי אזורים שבהם נדרש מענה מיידי',
-    'איתור צרכים של אוכלוסיות תלויות מים והיערכות לחלוקה',
-    'הנחיות ברורות לגבי שימוש במים ועדכונים מאומתים',
-    'בדיקת תנאי תברואה והחלטה אם ניתן להפעיל מסגרות',
-    'הפעלת ספקים, מכליות מים ופתרונות חלופיים',
-    'איוש מוקד, צוותי שטח ונקודות חלוקת מים'
-  ],
-  monument: [
-    'תיאום בדיקת האירוע במרחב הציבורי עם המשטרה',
-    'הערכת התקהלות או תגובות תושבים סביב האתר',
-    'הבהרה מהו מסר מזויף והפניה למקורות רשמיים',
-    'שיח עם מסגרות חינוכיות על זיהוי מסרים מניפולטיביים',
-    'תיאום עם מפעילי האתר לבדיקת מערכות התצוגה',
-    'מינוי גורם מוסמך לאישור מסרים ועדכונים לציבור'
-  ],
-  hall: [
-    'תיאום עם המשטרה וכוחות החירום לניהול האירוע במקום',
-    'מתן מענה למשתתפים מבוהלים וסיוע למי שזקוק לכך',
-    'הפצת מידע מאומת כדי למנוע שמועות ותיעוד מטעה',
-    'עדכון מסגרות או קבוצות שהיו אמורות להגיע למקום',
-    'בדיקת האולם, מערכות ההגברה וההקרנה לפני חזרה לפעילות',
-    'חלוקת תפקידים ברורה לצוותי המקום ולמוקד העירוני'
-  ],
-  fear: [
-    'הערכת אמינות האיום ותיאום עם המשטרה ופיקוד העורף',
-    'זיהוי תושבים שזקוקים להרגעה או לסיוע ממוקד',
-    'פרסום מסר קצר, מאומת ועקבי בערוצים הרשמיים',
-    'הנחיית צוותים כיצד לשוחח עם ילדים בלי להגביר בהלה',
-    'בדיקת מסכים ומערכות פרסום שנפרצו',
-    'הגדרת דובר מוסמך ותיאום מסרים בין המכלולים'
-  ],
-  sms: [
-    'העברת דוגמאות ההודעות לגורמי הביטחון לבחינה',
-    'מענה לתושבים מודאגים והפניית פניות דחופות',
-    'פרסום אזהרה עם דוגמה להודעה מזויפת והנחיות פעולה',
-    'שליחת הנחיות להורים ולצוותי חינוך דרך ערוצים מאומתים',
-    'היערכות לעומס פניות במוקדים ובערוצי השירות',
-    'תגבור מוקד המידע וניהול משמרות לפי היקף הפניות'
-  ],
-  leak: [
-    'תיאום טיפול באירוע ובחינת סיכון לאנשים שפרטיהם נחשפו',
-    'הכוונת תושבים שנפגעו לקבלת סיוע והגנה על פרטיותם',
-    'הסבר מה ידוע, מה נבדק ואיך להיזהר מהתחזות',
-    'הנחיית צוותים והורים לגבי הודעות חשודות ופגיעה בפרטיות',
-    'תיאום עם מערכות המידע לצמצום החשיפה ולחידוש השירות',
-    'תדרוך עובדים ושמירה על טיפול אחיד ודיסקרטי בפניות'
-  ],
-  mobilize: [
-    'אימות הקריאה לפעולה ותיאום עם המשטרה ופיקוד העורף',
-    'הערכת מוקדי התקהלות אפשריים והיערכות למתן מענה',
-    'הפרכת הסרטון המזויף והפצת עדכון בערוצים רשמיים',
-    'העברת הנחיות למסגרות כדי למנוע הפצת הסרטון בקרב תלמידים',
-    'היערכות אם נוצרת התקהלות או חסימת דרכים',
-    'תיאום מסרים ותחומי אחריות בין הדוברות, המוקד והשטח'
-  ],
-  cameras: [
-    'בדיקת חשיפה של מערכי המצלמות ותיאום עם גורמי הביטחון',
-    'מתן מענה לפניות תושבים בנושא פרטיות ובטיחות',
-    'הסבר מדוד על היקף האירוע בלי להפיץ פרטים רגישים',
-    'הנחיית מוסדות חינוך לדווח על חשש לפגיעה בפרטיות',
-    'תיאום עם ספקי המצלמות להשבת המערכת באופן בטוח',
-    'הגבלת גישה למידע ותיעוד פעולות הטיפול באירוע'
-  ],
-  elevator: [
-    'תיאום עם שירותי הכבאות וההצלה במקרים של לכודים',
-    'איתור דיירים הזקוקים לסיוע במבנים ללא מעלית',
-    'פרסום הנחיות בטיחות ועדכונים על מצב השירות',
-    'בדיקת נגישות ובטיחות במסגרות חינוך ובמרכזי חירום',
-    'הפעלת טכנאים וספקים ותעדוף תיקונים חיוניים',
-    'חלוקת צוותי שטח לפי דחיפות ומיקום התקלות'
-  ],
-  lights: [
-    'תיאום הכוונת תנועה עם המשטרה וגורמי החירום',
-    'עדכון תושבים על צירים עמוסים ודרכי הגעה חלופיות',
-    'פרסום עדכונים בזמן אמת בערוצים הזמינים',
-    'תיאום הסעות ואיסוף בטוח של תלמידים לפי מצב התנועה',
-    'שליחת צוותי תחזוקה ותעדוף צמתים מרכזיים',
-    'הצבת עובדים לסיוע בשטח ותיאום בין צוותים'
-  ],
-  ddos: [
-    'שמירת ערוץ תקשורת חלופי להעברת אירועים דחופים',
-    'פרסום דרכים חלופיות לקבלת סיוע ולדיווח על צרכים',
-    'עדכון על תקלה במוקד והכוונה לערוצים חלופיים',
-    'העברת פרטי קשר חלופיים למוסדות ולרכזי החירום',
-    'תיאום עם ספקי המערכת לשיקום השירות',
-    'תגבור מענה אנושי ותעדוף פניות לפי דחיפות'
-  ],
-  phishing: [
-    'דיווח לגורמי הסייבר והביטחון על התחזות לדמות ציבורית',
-    'סיוע לתושבים שקיבלו הודעה או מסרו פרטים',
-    'פרסום ההודעה המזויפת כאזהרה, בלי להפיץ את הקישור',
-    'הדרכת צוותים והורים לבדוק מקור לפני לחיצה או העברה',
-    'בדיקת מערכות שנפגעו והחלפת פרטי גישה לפי הצורך',
-    'תדרוך עובדי הרשות לא למסור פרטים דרך קישורים חשודים'
-  ],
-  link: [
-    'העברת דיווחים על קישורים זדוניים לגורמים הרלוונטיים',
-    'הכוונת תושבים שנפגעו לצעדי הגנה ולקבלת סיוע',
-    'פרסום דרך פשוטה לדווח על קישור חשוד',
-    'תרגול זיהוי קישורים חשודים עם צוותים ותלמידים',
-    'בדיקת חשבונות ומערכות רשות במקרה של חשיפה',
-    'רענון הנחיות לעובדים ודיווח מהיר על אירוע'
-  ]
+// המתקפה "פריצה למצלמות" (id: cameras) לא משתתפת בחלק הזה. כדי להחזיר אותה מוחקים את הסינון.
+const TOPICS = ATTACKS.filter((attack) => attack.id !== 'cameras')
+
+// 12 תגיות בכל מתקפה (שתיים לכל מכלול), שש בכל מסך צדדי. התוכן נמצא ב-impacts.js.
+// כדי שהתגיות יהיו מפוזרות בגבהים ובגדלים שונים (וגם מי שמסתיר חלק מהמסך יראה תגיות למעלה),
+// לכל מקום יש גודל כתב, רוחב מרבי ויישור משלו. במסך השני מתחילים מאמצע הרשימה כדי שהצדדים לא יהיו זהים.
+const SLOTS = [
+  { fs: 3.2, mw: 80, as: 'flex-start', mt: 0 },
+  { fs: 2.6, mw: 64, as: 'flex-end', mt: 1 },
+  { fs: 3.0, mw: 74, as: 'center', mt: 0.5 },
+  { fs: 2.5, mw: 60, as: 'flex-start', mt: 1.2 },
+  { fs: 3.1, mw: 78, as: 'flex-end', mt: 0 },
+  { fs: 2.7, mw: 68, as: 'center', mt: 0.8 },
+]
+
+function TagColumn({ tags, side, topic }) {
+  return (
+    <section className="panel meaning-side meaning-tag-panel">
+      <header><h2>השפעות אפשריות</h2></header>
+      <div className="impact-tags">
+        {tags.map((t, i) => {
+          const s = SLOTS[(i + side * 3) % SLOTS.length]
+          return (
+            <div className="impact-tag" key={`${topic}-${side}-${i}`}
+              style={{ '--fs': `${s.fs}vh`, '--mw': `${s.mw}%`, '--as': s.as, '--mt': `${s.mt}vh`, animationDelay: `${(i * 2 + side) * 90}ms` }}>
+              <b className="mk">{t.mk}</b>
+              <span>{t.text}</span>
+            </div>
+          )
+        })}
+      </div>
+    </section>
+  )
 }
-
-// התמונה cameras.jpg לא משתתפת בחלק הזה, בהתאם לבקשה המקורית.
-const TOPICS = ATTACKS.filter((attack) => !String(attack.image).toLowerCase().endsWith('/cameras.jpg'))
 
 export default function MeaningGame({ onAgain }) {
   const topics = useMemo(() => TOPICS, [])
   const [index, setIndex] = useState(0)
   const [revealed, setRevealed] = useState(false)
   const current = topics[index]
-  const tags = IMPACTS[current?.id] || [
-    'תיאום תמונת מצב עם גורמי החירום',
-    'זיהוי תושבים הזקוקים לסיוע',
-    'הפצת הנחיות מאומתות',
-    'תיאום תיקון והשבת השירות',
-    'איוש הצוותים ותיאום משימות'
-  ]
   const finished = index >= topics.length
 
   function advance() {
@@ -140,27 +50,24 @@ export default function MeaningGame({ onAgain }) {
     else { setIndex((n) => n + 1); setRevealed(false) }
   }
 
-  if (finished) return <main className="stage meaning-stage meaning-learning">
-    <section className="panel meaning-side empty-side" />
-    <section className="panel meaning-center meaning-finish">
-      <h1 className="meaning-title">ומה המשמעויות?</h1>
-      <div className="meaning-score">סיימנו לעבור על {topics.length} מתקפות</div>
-      <p className="meaning-finish-message">אילו השפעות נוספות זיהיתם במהלך הפעילות?</p>
-      <button className="go" onClick={onAgain}>חזרה להתחלה</button>
-    </section>
-    <section className="panel meaning-side empty-side" />
-  </main>
+  if (finished) return <>
+    <main className="stage meaning-stage meaning-learning">
+      <section className="panel meaning-side empty-side" />
+      <section className="panel meaning-center meaning-finish">
+        <h1 className="meaning-title">ומה המשמעויות?</h1>
+        <div className="meaning-score">סיימנו לעבור על {topics.length} מתקפות</div>
+        <p className="meaning-finish-message">אילו השפעות נוספות זיהיתם במהלך הפעילות?</p>
+        <button className="go" onClick={onAgain}>חזרה להתחלה</button>
+      </section>
+      <section className="panel meaning-side empty-side" />
+    </main>
+    <Confetti />
+  </>
 
-  const leftTags = revealed ? tags.slice(0, Math.ceil(tags.length / 2)) : []
-  const rightTags = revealed ? tags.slice(Math.ceil(tags.length / 2)) : []
+  const [sideA, sideB] = revealed ? tagsFor(current.id) : [[], []]
 
   return <main className="stage meaning-stage meaning-learning">
-    <section className="panel meaning-side meaning-tag-panel">
-      <header><h2>השפעות אפשריות</h2></header>
-      <div className="impact-tags">
-        {leftTags.map((tag, i) => <div className="impact-tag" key={`${index}-${tag}`} style={{ animationDelay: '0ms' }}>{tag}</div>)}
-      </div>
-    </section>
+    <TagColumn tags={sideA} side={0} topic={index} />
     <section className="panel meaning-center meaning-learning-center">
       <h1 className="meaning-title">ומה המשמעויות?</h1>
       <h2 className="impact-topic-title">{current.title}</h2>
@@ -172,11 +79,6 @@ export default function MeaningGame({ onAgain }) {
       </div>
       <div className="learning-progress"><i style={{ width: `${((index + (revealed ? 1 : 0)) / topics.length) * 100}%` }} /></div>
     </section>
-    <section className="panel meaning-side meaning-tag-panel">
-      <header><h2>השפעות אפשריות</h2></header>
-      <div className="impact-tags">
-        {rightTags.map((tag, i) => <div className="impact-tag" key={`${index}-${tag}`} style={{ animationDelay: '0ms' }}>{tag}</div>)}
-      </div>
-    </section>
+    <TagColumn tags={sideB} side={1} topic={index} />
   </main>
 }

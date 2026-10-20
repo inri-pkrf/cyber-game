@@ -35,7 +35,7 @@ function Card({ label, num, disabled, selected, onLong }) {
 }
 
 // המסך השמאלי: כל שמות המתקפות. לחיצה ארוכה פותחת מקלדת להקלדת מספר התמונה.
-export default function Titles({ order, done, onMatch }) {
+export default function Titles({ order, done, onMatch, onAllDone }) {
   const cards = useMemo(() => shuffle([
     ...ATTACKS.map((a) => ({ key: a.id, id: a.id, title: a.title })),
     ...DECOYS.map((t, i) => ({ key: 'd' + i, id: null, title: t })),
@@ -74,7 +74,7 @@ export default function Titles({ order, done, onMatch }) {
             <div className="bd">
               <h3>{current.title}</h3>
               <p>{current.text}</p>
-              <button onClick={() => setOpen(null)}>המשך</button>
+              <button onClick={() => { setOpen(null); if (done.length === ATTACKS.length) onAllDone?.() }}>המשך</button>
             </div>
           </div>
         </div>

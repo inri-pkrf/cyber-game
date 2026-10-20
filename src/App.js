@@ -6,6 +6,8 @@ import Titles from './Titles.js'
 import Intro from './Intro.js'
 import { unlock } from './sound.js'
 import MeaningGame from './MeaningGame.js'
+import Confetti from './Confetti.js'
+import QuestionMarks from './QuestionMarks.js'
 
 const shuffle = (a) => {
   a = [...a]
@@ -21,6 +23,7 @@ export default function App() {
   const [order, setOrder] = useState(() => shuffle(ATTACKS)) // סדר התמונות = המספרים (מתערבב בכל משחק חדש)
   const [game, setGame] = useState(0)
   const [showNextButton, setShowNextButton] = useState(false)
+  const [celebrate, setCelebrate] = useState(false) // קונפטי בסיום החלק הראשון
 
   // כשההתאמות מסתיימות, משאירים את מסך המשחק הראשון מוצג ומחליפים את המונה בכפתור אחרי 5 שניות.
   useEffect(() => {
@@ -39,17 +42,18 @@ export default function App() {
 
   const start = () => { setPhase('leaving'); setTimeout(() => setPhase('play'), 500) }
   // משחק חדש: מערבבים מחדש את מספרי התמונות ואת השמות ומאפסים את ההתאמות. (בטעינת הדף הם מתערבבים גם כן.)
-  const again = () => { setOrder(shuffle(ATTACKS)); setDone([]); setGame((g) => g + 1); setPhase('intro') }
+  const again = () => { setOrder(shuffle(ATTACKS)); setDone([]); setGame((g) => g + 1); setCelebrate(false); setPhase('intro') }
   const match = (id) => setDone((d) => {
     if (d.includes(id)) return d
     const next = [...d, id]
     return next
   })
   const startMeanings = () => setPhase('meaning-play')
-  const goToMeaningsIntro = () => setPhase('meaning-intro')
+  const goToMeaningsIntro = () => { setCelebrate(false); setPhase('meaning-intro') }
   if (phase === 'meaning-play') return <MeaningGame onAgain={again} />
   if (phase === 'meaning-intro') return (
     <main className="stage meaning-stage meaning-transition">
+      <QuestionMarks />
       <section className="panel meaning-side empty-side" />
       <section className="panel meaning-center"><h1 className="meaning-title">ומה המשמעויות?</h1><button className="go" onClick={startMeanings}>התחלה</button></section>
       <section className="panel meaning-side empty-side" />
@@ -60,9 +64,10 @@ export default function App() {
       <main className="stage">
         <Gallery order={order} done={done} numbered={phase !== 'intro'} />
         <Info done={done} onAgain={again} showNextButton={showNextButton} onNext={goToMeaningsIntro} />
-        <Titles key={game} order={order} done={done} onMatch={match} />
+        <Titles key={game} order={order} done={done} onMatch={match} onAllDone={() => setCelebrate(true)} />
       </main>
       {(phase === 'intro' || phase === 'leaving') && <Intro leaving={phase === 'leaving'} onStart={start} />}
+      {celebrate && <Confetti />}
     </>
   )
 }

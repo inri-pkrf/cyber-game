@@ -27,3 +27,10 @@ export const playWrong = () => {
   const c = ac(); if (!c) return
   tone(c, 220, 0, 0.2, 'sawtooth', 0.18); tone(c, 150, 0.18, 0.4, 'sawtooth', 0.18)
 }
+
+// ניצחון (מופעל עם הקונפטי): ארפג'יו עולה ואחריו אקורד מלא
+export const playWin = () => {
+  const c = ac(); if (!c) return
+  ;[523.25, 659.25, 783.99, 1046.5, 1318.5].forEach((f, i) => tone(c, f, i * 0.11, 0.35, 'triangle', 0.22))
+  ;[523.25, 659.25, 783.99, 1046.5].forEach((f) => tone(c, f, 0.6, 1.0, 'sine', 0.12))
+}
