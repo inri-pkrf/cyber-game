@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/cyber-game/static/css/main.d7a58988.css",
-    "main.js": "/cyber-game/static/js/main.0b0b495c.js",
+    "main.css": "/cyber-game/static/css/main.8e6a9916.css",
+    "main.js": "/cyber-game/static/js/main.2d82ffb4.js",
     "static/media/assistant-latin-700-normal.woff": "/cyber-game/static/media/assistant-latin-700-normal.6e0532b8412176c81044.woff",
     "static/media/assistant-latin-400-normal.woff": "/cyber-game/static/media/assistant-latin-400-normal.02f27e42bfe570ee9f0a.woff",
     "static/media/assistant-latin-600-normal.woff": "/cyber-game/static/media/assistant-latin-600-normal.cc96037adb621c498de8.woff",
@@ -39,11 +39,11 @@
     "static/media/karantina-latin-ext-400-normal.woff": "/cyber-game/static/media/karantina-latin-ext-400-normal.64af187c1fcb89caaab6.woff",
     "static/media/karantina-latin-ext-700-normal.woff": "/cyber-game/static/media/karantina-latin-ext-700-normal.62591ea90fb48c6d7b82.woff",
     "index.html": "/cyber-game/index.html",
-    "main.d7a58988.css.map": "/cyber-game/static/css/main.d7a58988.css.map",
-    "main.0b0b495c.js.map": "/cyber-game/static/js/main.0b0b495c.js.map"
+    "main.8e6a9916.css.map": "/cyber-game/static/css/main.8e6a9916.css.map",
+    "main.2d82ffb4.js.map": "/cyber-game/static/js/main.2d82ffb4.js.map"
   },
   "entrypoints": [
-    "static/css/main.d7a58988.css",
-    "static/js/main.0b0b495c.js"
+    "static/css/main.8e6a9916.css",
+    "static/js/main.2d82ffb4.js"
   ]
 }
