@@ -36,7 +36,7 @@ h2 { margin: 0; font: 400 5vh/1 var(--head); letter-spacing: .02em; }
 .rows { --g: 1.6vh; flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--g); }
 .row { display: flex; justify-content: center; gap: var(--g); }
 .tile { position: relative; flex: none; width: var(--w); margin: 0; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 1vh; background: var(--raise); transition: box-shadow .3s; }
-.tile img { display: block; width: 100%; height: 100%; object-fit: contain; object-position: center; background: var(--raise); pointer-events: none; }
+.tile img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center; background: transparent; pointer-events: none; }
 .num { position: absolute; top: 0; right: 0; left: auto; display: grid; place-items: center; min-width: 3vh; height: 3vh; padding: 0 .7vh; font: 700 2.3vh/1 var(--head); color: var(--ink); background: var(--acc); border-radius: 0 0 0 1vh; transition: opacity .5s, transform .5s; transform-origin: 100% 0; }
 .nonum .num { opacity: 0; transform: scale(.4); }
 .gallery header { transition: opacity .5s; }
@@ -197,3 +197,65 @@ button { margin-top: 1vh; padding: 1.4vh 3.4vw; font: 600 3vh var(--body); color
 
 /* קונפטי על כל שלושת המסכים */
 .confetti { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 1000; pointer-events: none; }
+
+
+/* כפתור ההתחלה הראשי בולט ומזמין ללחיצה */
+.intro .ip.mid .go {
+  font-family: 'Assistant', var(--body);
+  font-size: 5.6vh;
+  font-weight: 800;
+  padding: 2.6vh 8vw;
+  animation: start-button-pulse 1.25s ease-in-out infinite;
+}
+@keyframes start-button-pulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 2.4vh var(--ok-soft); filter: brightness(1); }
+  50% { transform: scale(1.045); box-shadow: 0 0 5.5vh var(--ok), 0 0 9vh var(--ok-soft); filter: brightness(1.18); }
+}
+
+/* קיצורי דרך צמודים ממש לקצה השמאלי של חלון המיצג */
+.skip-controls {
+  position: fixed;
+  z-index: 1500;
+  top: 1.2vh;
+  left: 0 !important;
+  right: auto !important;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  direction: ltr;
+  width: max-content;
+  max-width: 22vw;
+  gap: .7vh;
+}
+.skip-controls .skip-btn {
+  margin: 0;
+  padding: .65vh 1vw;
+  font: 700 1.8vh/1.15 'Assistant', var(--body);
+  color: var(--text);
+  background: #14171feF;
+  border: 1px solid var(--acc-soft);
+  border-radius: .8vh;
+  box-shadow: 0 0 1.5vh #0008;
+  white-space: nowrap;
+}
+.skip-controls .skip-finish-btn {
+  border-color: var(--ok-soft);
+}
+@media (prefers-reduced-motion: reduce) {
+  .intro .ip.mid .go { animation: none; }
+}
+
+.meaning-learning .meaning-discussion {
+  width: 96%;
+  max-width: none;
+  white-space: nowrap;
+  font-size: 1.8vh;
+  line-height: 1.2;
+}
+.meaning-learning .learning-controls .go {
+  width: max-content;
+  max-width: 96%;
+  white-space: nowrap;
+  padding-inline: 4vw;
+  font-size: 2.8vh;
+}

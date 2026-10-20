@@ -38,12 +38,12 @@ function TagColumn({ tags, side, topic }) {
   )
 }
 
-export default function MeaningGame({ onAgain }) {
+export default function MeaningGame({ onAgain, forceFinish = false }) {
   const topics = useMemo(() => TOPICS, [])
   const [index, setIndex] = useState(0)
   const [revealed, setRevealed] = useState(false)
   const current = topics[index]
-  const finished = index >= topics.length
+  const finished = forceFinish || index >= topics.length
 
   function advance() {
     if (!revealed) setRevealed(true)

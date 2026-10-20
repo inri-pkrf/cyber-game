@@ -24,6 +24,7 @@ export default function App() {
   const [game, setGame] = useState(0)
   const [showNextButton, setShowNextButton] = useState(false)
   const [celebrate, setCelebrate] = useState(false) // קונפטי בסיום החלק הראשון
+  const [forceMeaningFinish, setForceMeaningFinish] = useState(false)
 
   // כשההתאמות מסתיימות, משאירים את מסך המשחק הראשון מוצג ומחליפים את המונה בכפתור אחרי 5 שניות.
   useEffect(() => {
@@ -48,19 +49,30 @@ export default function App() {
     const next = [...d, id]
     return next
   })
-  const startMeanings = () => setPhase('meaning-play')
+  const startMeanings = () => { setForceMeaningFinish(false); setPhase('meaning-play') }
+  const skipToMeaningFinish = () => { setForceMeaningFinish(true); setPhase('meaning-play') }
   const goToMeaningsIntro = () => { setCelebrate(false); setPhase('meaning-intro') }
-  if (phase === 'meaning-play') return <MeaningGame onAgain={again} />
+  const skipButtons = (
+    <nav className="skip-controls" aria-label="קיצורי דרך">
+      {phase !== 'meaning-play' && <button className="skip-btn" onClick={goToMeaningsIntro}>לתחילת החלק השני</button>}
+      <button className="skip-btn skip-finish-btn" onClick={skipToMeaningFinish}>לסיום החלק השני</button>
+    </nav>
+  )
+  if (phase === 'meaning-play') return <>{skipButtons}<MeaningGame onAgain={again} forceFinish={forceMeaningFinish} /></>
   if (phase === 'meaning-intro') return (
-    <main className="stage meaning-stage meaning-transition">
-      <QuestionMarks />
-      <section className="panel meaning-side empty-side" />
-      <section className="panel meaning-center"><h1 className="meaning-title">ומה המשמעויות?</h1><button className="go" onClick={startMeanings}>התחלה</button></section>
-      <section className="panel meaning-side empty-side" />
-    </main>
+    <>
+      {skipButtons}
+      <main className="stage meaning-stage meaning-transition">
+        <QuestionMarks />
+        <section className="panel meaning-side empty-side" />
+        <section className="panel meaning-center"><h1 className="meaning-title">ומה המשמעויות?</h1><button className="go" onClick={startMeanings}>התחלה</button></section>
+        <section className="panel meaning-side empty-side" />
+      </main>
+    </>
   )
   return (
     <>
+      {skipButtons}
       <main className="stage">
         <Gallery order={order} done={done} numbered={phase !== 'intro'} />
         <Info done={done} onAgain={again} showNextButton={showNextButton} onNext={goToMeaningsIntro} />
